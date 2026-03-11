@@ -1,0 +1,41 @@
+{% extends "carbon/base.html" %}
+{% block title %}Connect Loyalty - CarbonCloud{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 550px;">
+    <h2>🏆 Connect to Loyalty Points</h2>
+
+    {% if loyalty_connected %}
+        <div class="alert alert-success">✅ You're already connected!</div>
+        <a href="{% url 'loyalty-dashboard' %}" class="btn btn-blue">View Dashboard</a>
+        <a href="{% url 'loyalty-disconnect' %}" class="btn btn-gray mt-1">Disconnect</a>
+    {% else %}
+        <p style="color: #718096; margin-bottom: 1.5rem;">Connect your Loyalty account to earn points when you log carbon entries.</p>
+
+        <h3 style="margin-bottom: 0.5rem;">Login to Existing Account</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="login">
+            <label>Username</label>
+            <input type="text" name="username" class="form-input" required>
+            <label>Password</label>
+            <input type="password" name="password" class="form-input" required>
+            <button type="submit" class="btn btn-blue" style="width: 100%;">Connect</button>
+        </form>
+
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e2e8f0;">
+
+        <h3 style="margin-bottom: 0.5rem;">Or Create New Loyalty Account</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="register">
+            <label>Username</label>
+            <input type="text" name="username" class="form-input" required>
+            <label>Email</label>
+            <input type="email" name="email" class="form-input" value="{{ user.email }}" required>
+            <label>Password (min 8 chars, not too common)</label>
+            <input type="password" name="password" class="form-input" required>
+            <button type="submit" class="btn btn-green" style="width: 100%;">Create & Connect</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "carbon/base.html" %}
+{% block title %}Edit Entry - CarbonCloud{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 600px;">
+    <h2>✏️ Edit Entry</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <label>{{ field.label }}</label>
+            {{ field }}
+        {% endfor %}
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button type="submit" class="btn btn-green">Update</button>
+            <a href="{% url 'entry-list' %}" class="btn btn-gray">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

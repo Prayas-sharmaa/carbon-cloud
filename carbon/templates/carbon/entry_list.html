@@ -1,0 +1,41 @@
+{% extends "carbon/base.html" %}
+{% block title %}Entries - CarbonCloud{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="flex-between mb-2">
+        <h2>🌍 Carbon Entries ({{ total_emissions }} kg total)</h2>
+        <a href="{% url 'entry-create' %}" class="btn btn-green">+ New Entry</a>
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <a href="{% url 'entry-list' %}" class="btn btn-sm {% if not selected_activity %}btn-blue{% else %}btn-gray{% endif %}">All</a>
+        <a href="?activity=transport" class="btn btn-sm {% if selected_activity == 'transport' %}btn-blue{% else %}btn-gray{% endif %}">Transport</a>
+        <a href="?activity=electricity" class="btn btn-sm {% if selected_activity == 'electricity' %}btn-blue{% else %}btn-gray{% endif %}">Electricity</a>
+        <a href="?activity=food" class="btn btn-sm {% if selected_activity == 'food' %}btn-blue{% else %}btn-gray{% endif %}">Food</a>
+        <a href="?activity=shopping" class="btn btn-sm {% if selected_activity == 'shopping' %}btn-blue{% else %}btn-gray{% endif %}">Shopping</a>
+    </div>
+
+    {% if entries %}
+        <table>
+            <tr><th>Date</th><th>Activity</th><th>CO₂ (kg)</th><th>Description</th><th>Actions</th></tr>
+            {% for e in entries %}
+                <tr>
+                    <td>{{ e.date }}</td>
+                    <td><span class="badge badge-green">{{ e.get_activity_type_display }}</span></td>
+                    <td>{{ e.emission_amount }}</td>
+                    <td>{{ e.description|truncatewords:10 }}</td>
+                    <td>
+                        <a href="{% url 'entry-update' e.pk %}" class="btn btn-blue btn-sm">Edit</a>
+                        <a href="{% url 'entry-delete' e.pk %}" class="btn btn-red btn-sm">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="icon">📭</div>
+            <p>No entries found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

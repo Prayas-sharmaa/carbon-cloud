@@ -1,0 +1,78 @@
+{% extends "carbon/base.html" %}
+{% block title %}Loyalty Dashboard - CarbonCloud{% endblock %}
+{% block content %}
+{% if not loyalty_connected %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="icon">🔗</div>
+            <p>Not connected to Loyalty Points.</p>
+            <a href="{% url 'loyalty-connect' %}" class="btn btn-green mt-2">Connect Now</a>
+        </div>
+    </div>
+{% else %}
+    {% if summary %}
+    <h2 style="margin-bottom: 1.5rem;">🏆 Loyalty Dashboard</h2>
+
+    <div class="stats">
+        <div class="stat-card blue">
+            <div class="number">{{ summary.balance.total_points }}</div>
+            <div class="label">Current Points</div>
+        </div>
+        <div class="stat-card green">
+            <div class="number">{{ summary.balance.lifetime_points }}</div>
+            <div class="label">Lifetime Points</div>
+        </div>
+        <div class="stat-card purple">
+            <div class="number">{{ summary.user.tier|title }}</div>
+            <div class="label">Your Tier</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h2>📋 Transaction History</h2>
+        {% if transactions %}
+            <table>
+                <tr><th>Date</th><th>Type</th><th>Points</th><th>Description</th></tr>
+                {% for t in transactions %}
+                    <tr>
+                        <td>{{ t.created_at|slice:":10" }}</td>
+                        <td>
+                            {% if t.points > 0 %}
+                                <span class="badge badge-green">{{ t.transaction_type }}</span>
+                            {% else %}
+                                <span class="badge badge-red">{{ t.transaction_type }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-weight: 700; color: {% if t.points > 0 %}#38a169{% else %}#e53e3e{% endif %};">
+                            {{ t.points|default:"0" }}
+                        </td>
+                        <td>{{ t.description|truncatewords:10 }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <p>No transactions yet. Log carbon entries to earn points!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if leaderboard %}
+    <div class="card">
+        <h2>🏅 Leaderboard</h2>
+        <table>
+            <tr><th>Rank</th><th>User</th><th>Tier</th><th>Points</th></tr>
+            {% for entry in leaderboard %}
+                <tr>
+                    <td>{{ entry.rank }}</td>
+                    <td>{{ entry.full_name|default:entry.username }}</td>
+                    <td><span class="badge badge-blue">{{ entry.tier|title }}</span></td>
+                    <td style="font-weight: 700;">{{ entry.lifetime_points }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

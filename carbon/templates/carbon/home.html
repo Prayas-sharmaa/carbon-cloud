@@ -1,0 +1,68 @@
+{% extends "carbon/base.html" %}
+{% block title %}Dashboard - CarbonCloud{% endblock %}
+{% block content %}
+<h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Welcome, {{ user.first_name|default:user.username }}! 👋</h2>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="number">{{ entry_count }}</div>
+        <div class="label">Total Entries</div>
+    </div>
+    <div class="stat-card green">
+        <div class="number">{{ total_emissions }} kg</div>
+        <div class="label">Total CO₂</div>
+    </div>
+    <div class="stat-card blue">
+        {% if loyalty_connected and loyalty_balance %}
+            <div class="number">{{ loyalty_balance.total_points }}</div>
+            <div class="label">Loyalty Points</div>
+        {% else %}
+            <div class="number">—</div>
+            <div class="label"><a href="{% url 'loyalty-connect' %}">Connect Loyalty</a></div>
+        {% endif %}
+    </div>
+</div>
+
+{% if breakdown %}
+<div class="card">
+    <h2>📊 Breakdown by Category</h2>
+    <table>
+        <tr><th>Activity</th><th>Entries</th><th>Total CO₂ (kg)</th></tr>
+        {% for item in breakdown %}
+            <tr>
+                <td>{{ item.activity_type|title }}</td>
+                <td>{{ item.count }}</td>
+                <td>{{ item.total }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="flex-between">
+        <h2>📝 Recent Entries</h2>
+        <a href="{% url 'entry-create' %}" class="btn btn-green btn-sm">+ New Entry</a>
+    </div>
+    {% if entries %}
+        <table class="mt-1">
+            <tr><th>Date</th><th>Activity</th><th>CO₂ (kg)</th><th>Description</th></tr>
+            {% for e in entries %}
+                <tr>
+                    <td>{{ e.date }}</td>
+                    <td><span class="badge badge-green">{{ e.get_activity_type_display }}</span></td>
+                    <td>{{ e.emission_amount }}</td>
+                    <td>{{ e.description|truncatewords:8 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <a href="{% url 'entry-list' %}" class="btn btn-blue btn-sm mt-2">View All Entries →</a>
+    {% else %}
+        <div class="empty-state mt-2">
+            <div class="icon">🌿</div>
+            <p>No entries yet. Start tracking your carbon footprint!</p>
+            <a href="{% url 'entry-create' %}" class="btn btn-green mt-2">Log Your First Entry</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
