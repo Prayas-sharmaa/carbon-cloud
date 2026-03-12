@@ -7,6 +7,9 @@ from .models import CarbonEntry
 from .forms import CarbonEntryForm, RegisterForm
 from .loyalty_service import LoyaltyService
 
+# NEW IMPORT (CloudMail API Service)
+from .services.cloudmail_service import CloudMailService
+
 
 # ==================== AUTH ====================
 
@@ -95,8 +98,12 @@ def loyalty_connect_view(request):
         elif action == "register":
             email = request.POST.get("email", request.user.email)
             result = LoyaltyService.register_and_connect(
-                request, username, email, password,
-                request.user.first_name, request.user.last_name,
+                request,
+                username,
+                email,
+                password,
+                request.user.first_name,
+                request.user.last_name,
             )
         else:
             result = {"success": False, "error": "Invalid action"}
@@ -107,9 +114,11 @@ def loyalty_connect_view(request):
         else:
             messages.error(request, f"Failed: {result['error']}")
 
-    return render(request, "carbon/loyalty_connect.html", {
-        "loyalty_connected": LoyaltyService.is_connected(request),
-    })
+    return render(
+        request,
+        "carbon/loyalty_connect.html",
+        {"loyalty_connected": LoyaltyService.is_connected(request)},
+    )
 
 
 @login_required
@@ -126,9 +135,15 @@ def loyalty_dashboard_view(request):
     leaderboard_result = LoyaltyService.get_leaderboard()
 
     context = {
-        "summary": summary_result.get("data") if summary_result.get("success") else None,
-        "transactions": transactions_result.get("data", []) if transactions_result.get("success") else [],
-        "leaderboard": leaderboard_result.get("data", []) if leaderboard_result.get("success") else [],
+        "summary": summary_result.get("data")
+        if summary_result.get("success")
+        else None,
+        "transactions": transactions_result.get("data", [])
+        if transactions_result.get("success")
+        else [],
+        "leaderboard": leaderboard_result.get("data", [])
+        if leaderboard_result.get("success")
+        else [],
         "loyalty_connected": LoyaltyService.is_connected(request),
     }
     return render(request, "carbon/loyalty_dashboard.html", context)
@@ -145,60 +160,136 @@ def entry_list(request):
     if activity:
         entries = entries.filter(activity_type=activity)
 
-    total_emissions = entries.aggregate(total=Sum("emission_amount"))["total"] or 0
+    total_emissions = (
+        entries.aggregate(total=Sum("emission_amount"))["total"] or 0
+    )
 
-    return render(request, "carbon/entry_list.html", {
-        "entries": entries,
-        "total_emissions": total_emissions,
-        "selected_activity": activity,
-    })
+    return render(
+        request,
+        "carbon/entry_list.html",
+        {
+            "entries": entries,
+            "total_emissions": total_emissions,
+            "selected_activity": activity,
+        },
+    )
 
 
 @login_required
 def entry_create(request):
     if request.method == "POST":
         form = CarbonEntryForm(request.POST)
+
         if form.is_valid():
             entry = form.save(commit=False)
             entry.user = request.user
             entry.save()
 
-            # Award loyalty points
-            points_result = LoyaltyService.award_points_for_entry(request, entry)
+            # ==========================
+            # AWARD LOYALTY POINTS
+            # ==========================
+            points_result = LoyaltyService.award_points_for_entry(
+                request, entry
+            )
 
+            # ==========================
+            # SEND EMAIL (CloudMail API)
+            # ==========================
+            email_result = None
+
+            if request.user.email:
+                subject = "Carbon Entry Recorded 🌱"
+
+                message = f"""
+Hello {request.user.first_name},
+
+Your carbon activity has been successfully recorded in CarbonCloud.
+
+Activity Type: {entry.activity_type}
+CO₂ Amount: {entry.emission_amount} kg
+Date: {entry.date}
+
+Thank you for helping reduce carbon emissions!
+
+— CarbonCloud Team
+"""
+
+                email_result = CloudMailService.send_email(
+                    to_email=request.user.email,
+                    subject=subject,
+                    message=message,
+                )
+
+            # ==========================
+            # USER FEEDBACK
+            # ==========================
             if points_result.get("success"):
                 pts = points_result["data"].get("points_earned", 0)
-                messages.success(request, f"Entry saved! You earned {pts} loyalty points.")
+                messages.success(
+                    request,
+                    f"Entry saved! You earned {pts} loyalty points.",
+                )
+
             elif LoyaltyService.is_connected(request):
-                messages.warning(request, f"Entry saved, but points failed: {points_result.get('error')}")
+                messages.warning(
+                    request,
+                    f"Entry saved, but points failed: {points_result.get('error')}",
+                )
+
             else:
-                messages.success(request, "Entry saved! Connect to Loyalty to earn rewards.")
+                messages.success(
+                    request,
+                    "Entry saved! Connect to Loyalty to earn rewards.",
+                )
+
+            # Optional email debug message
+            if email_result and not email_result.get("success"):
+                messages.warning(
+                    request,
+                    f"Entry saved but email failed: {email_result.get('error')}",
+                )
 
             return redirect("entry-list")
+
     else:
         form = CarbonEntryForm()
+
     return render(request, "carbon/entry_create.html", {"form": form})
 
 
 @login_required
 def entry_update(request, pk):
     entry = get_object_or_404(CarbonEntry, pk=pk, user=request.user)
+
     if request.method == "POST":
         form = CarbonEntryForm(request.POST, instance=entry)
+
         if form.is_valid():
             form.save()
             messages.success(request, "Entry updated.")
             return redirect("entry-list")
+
     else:
         form = CarbonEntryForm(instance=entry)
-    return render(request, "carbon/entry_update.html", {"form": form, "entry": entry})
+
+    return render(
+        request,
+        "carbon/entry_update.html",
+        {"form": form, "entry": entry},
+    )
 
 
 @login_required
 def entry_delete(request, pk):
     entry = get_object_or_404(CarbonEntry, pk=pk, user=request.user)
+
     if request.method == "POST":
         entry.delete()
         messages.success(request, "Entry deleted.")
         return redirect("entry-list")
-    return render(request, "carbon/entry_delete.html", {"entry": entry})
+
+    return render(
+        request,
+        "carbon/entry_delete.html",
+        {"entry": entry},
+    )

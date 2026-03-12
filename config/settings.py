@@ -91,3 +91,9 @@ CSRF_TRUSTED_ORIGINS = [
     "http://loyalty-api.us-east-1.elasticbeanstalk.com/",
     "http://carbon-app.us-east-1.elasticbeanstalk.com/",
 ]
+
+# ===== CloudMail API (Classmate's Web Service) =====
+CLOUDMAIL_API_URL = os.getenv(
+    "CLOUDMAIL_API_URL",
+    "https://563u4wcc1g.execute-api.us-east-1.amazonaws.com/prod"
+)
