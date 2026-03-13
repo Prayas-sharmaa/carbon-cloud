@@ -2,10 +2,10 @@
 {% block title %}Connect Loyalty - CarbonCloud{% endblock %}
 {% block content %}
 <div class="card" style="max-width: 550px;">
-    <h2>🏆 Connect to Loyalty Points</h2>
+    <h2> Connect to Loyalty Points</h2>
 
     {% if loyalty_connected %}
-        <div class="alert alert-success">✅ You're already connected!</div>
+        <div class="alert alert-success"> You're already connected!</div>
         <a href="{% url 'loyalty-dashboard' %}" class="btn btn-blue">View Dashboard</a>
         <a href="{% url 'loyalty-disconnect' %}" class="btn btn-gray mt-1">Disconnect</a>
     {% else %}

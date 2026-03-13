@@ -2,13 +2,18 @@
 {% block title %}Log Entry - CarbonCloud{% endblock %}
 {% block content %}
 <div class="card" style="max-width: 600px;">
-    <h2>🌱 Log Carbon Entry</h2>
+    <h2> Log Carbon Entry</h2>
     <p style="color: #718096; margin-bottom: 1.5rem;">Track your carbon footprint and earn loyalty points!</p>
-    <form method="post">
+    <form method="post" novalidate>
         {% csrf_token %}
         {% for field in form %}
-            <label>{{ field.label }}</label>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
+            {% if field.errors %}
+                <div class="error" style="color: red; font-size: 0.85rem;">
+                    {{ field.errors|striptags }}
+                </div>
+            {% endif %}
         {% endfor %}
         <div style="display: flex; gap: 1rem; margin-top: 1rem;">
             <button type="submit" class="btn btn-green">Save Entry</button>
@@ -16,4 +21,13 @@
         </div>
     </form>
 </div>
+
+<script>
+    // Optional: prevent manual future dates in older browsers
+    const dateInput = document.querySelector('input[type="date"]');
+    if(dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('max', today);
+    }
+</script>
 {% endblock %}

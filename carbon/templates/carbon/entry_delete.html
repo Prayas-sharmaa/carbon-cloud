@@ -2,7 +2,7 @@
 {% block title %}Delete Entry - CarbonCloud{% endblock %}
 {% block content %}
 <div class="card" style="max-width: 500px;">
-    <h2>🗑️ Delete Entry?</h2>
+    <h2> Delete Entry?</h2>
     <div style="background: #fed7d7; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
         <p><strong>{{ entry.date }}</strong> — {{ entry.get_activity_type_display }} — {{ entry.emission_amount }} kg CO₂</p>
         {% if entry.description %}<p style="color: #718096; margin-top: 0.5rem;">{{ entry.description }}</p>{% endif %}

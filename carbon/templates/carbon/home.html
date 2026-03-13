@@ -1,7 +1,7 @@
 {% extends "carbon/base.html" %}
 {% block title %}Dashboard - CarbonCloud{% endblock %}
 {% block content %}
-<h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Welcome, {{ user.first_name|default:user.username }}! 👋</h2>
+<h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Welcome, {{ user.first_name|default:user.username }}! </h2>
 
 <div class="stats">
     <div class="stat-card">
@@ -15,7 +15,15 @@
     <div class="stat-card blue">
         {% if loyalty_connected and loyalty_balance %}
             <div class="number">{{ loyalty_balance.total_points }}</div>
-            <div class="label">Loyalty Points</div>
+            <div class="label">
+                Loyalty Points
+                {% if loyalty_value_eur %}
+                    (~€{{ loyalty_value_eur }})
+                {% endif %}
+            </div>
+            <div class="small-text" style="font-size:0.8rem; color:#666;">
+                Conversion: {{ conversion_rate }}
+            </div>
         {% else %}
             <div class="number">—</div>
             <div class="label"><a href="{% url 'loyalty-connect' %}">Connect Loyalty</a></div>
@@ -25,7 +33,7 @@
 
 {% if breakdown %}
 <div class="card">
-    <h2>📊 Breakdown by Category</h2>
+    <h2> Breakdown by Category</h2>
     <table>
         <tr><th>Activity</th><th>Entries</th><th>Total CO₂ (kg)</th></tr>
         {% for item in breakdown %}
@@ -41,7 +49,7 @@
 
 <div class="card">
     <div class="flex-between">
-        <h2>📝 Recent Entries</h2>
+        <h2> Recent Entries</h2>
         <a href="{% url 'entry-create' %}" class="btn btn-green btn-sm">+ New Entry</a>
     </div>
     {% if entries %}
@@ -59,10 +67,23 @@
         <a href="{% url 'entry-list' %}" class="btn btn-blue btn-sm mt-2">View All Entries →</a>
     {% else %}
         <div class="empty-state mt-2">
-            <div class="icon">🌿</div>
+            <div class="icon"></div>
             <p>No entries yet. Start tracking your carbon footprint!</p>
             <a href="{% url 'entry-create' %}" class="btn btn-green mt-2">Log Your First Entry</a>
         </div>
+    {% endif %}
+</div>
+<div class="card mt-2">
+    <h2> Current UK Electricity Carbon Intensity </h2>
+    {% if carbon_intensity.error %}
+        <p style="color:red;">Could not fetch carbon intensity data.</p>
+    {% else %}
+        <p>
+            Forecast: {{ carbon_intensity.forecast }} gCO₂/kWh <br>
+            Actual: {{ carbon_intensity.actual }} gCO₂/kWh <br>
+            Intensity level: <strong>{{ carbon_intensity.index|title }}</strong>
+        </p>
+        <small>From {{ carbon_intensity.from }} to {{ carbon_intensity.to }}</small>
     {% endif %}
 </div>
 {% endblock %}
