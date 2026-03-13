@@ -1,7 +1,7 @@
 {% extends "carbon/base.html" %}
 {% block title %}Dashboard - CarbonCloud{% endblock %}
 {% block content %}
-<h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Welcome, {{ user.first_name|default:user.username }}! </h2>
+<h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Hello, {{ user.first_name|default:user.username }}! </h2>
 
 <div class="stats">
     <div class="stat-card">
