@@ -1,14 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ -z "$DD_API_KEY" ]; then
-  echo "DD_API_KEY is not set, skipping Datadog install"
-  exit 0
-fi
-
-echo "Installing Datadog Agent..."
-
-DD_API_KEY=$DD_API_KEY \
+DD_API_KEY="ca6e64f43cc7f1f92bac2c772a57533d" \
 DD_SITE="datadoghq.com" \
 DD_APM_ENABLED=true \
 DD_LOGS_ENABLED=true \
