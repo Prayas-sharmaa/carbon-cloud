@@ -84,7 +84,7 @@ LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
 
-LOYALTY_API_BASE_URL=http://loyalty-api.us-east-1.elasticbeanstalk.com/api/v1
+LOYALTY_API_BASE_URL="http://loyalty-api.us-east-1.elasticbeanstalk.com/api/v1"
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
