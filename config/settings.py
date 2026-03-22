@@ -53,9 +53,13 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',  # or mysql
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'Celebal123',
+        'HOST': 'loyalty-db.ceww9p7gmfyy.us-east-1.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
