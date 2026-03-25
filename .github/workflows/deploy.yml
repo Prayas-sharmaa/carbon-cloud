@@ -24,6 +24,15 @@ jobs:
           pip install -r requirements.txt
           pip install awsebcli  
 
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -37,3 +46,9 @@ jobs:
           eb init ${{ secrets.EB_APP_NAME }} --platform python-3.11 --region ${{ secrets.AWS_DEFAULT_REGION }}
           eb use ${{ secrets.EB_ENV_NAME }}
           eb deploy --staged
+
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          target: ${{ secrets.APP_URL }}
+          fail_action: false
