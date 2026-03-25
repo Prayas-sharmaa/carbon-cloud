@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements.txt
           pip install awsebcli  
 
-  SonarCloud Scan:
+  SonarCloud-Scan:
     runs-on: ubuntu-latest
     needs: Dependencies
     steps:
@@ -37,7 +37,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  AWS Setup:
+  AWS-Setup:
     runs-on: ubuntu-latest
     needs: SonarCloud Scan
     steps:
@@ -49,7 +49,7 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} 
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-  Beanstalk Deployment:
+  Beanstalk-Deployment:
     runs-on: ubuntu-latest
     needs: AWS Setup
     steps:
@@ -59,7 +59,7 @@ jobs:
           eb use ${{ secrets.EB_ENV_NAME }}
           eb deploy --staged
 
-  zap_scan:
+  zap-scan:
       runs-on: ubuntu-latest
       needs: Beanstalk Deployment
       name: OWASP ZAP Baseline Scan
