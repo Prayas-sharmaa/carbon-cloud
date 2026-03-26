@@ -37,7 +37,7 @@ class CarbonEntryForm(forms.ModelForm):
                     "class": "form-input",
                     "type": "date",
                     "required": True,
-                    "max": timezone.now().date().isoformat(),  # Prevent future date in HTML5
+                    "max": timezone.now().date().isoformat(),  # Prevent future date 
                 }
             ),
         }

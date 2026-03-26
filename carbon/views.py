@@ -7,12 +7,12 @@ from .models import CarbonEntry
 from .forms import CarbonEntryForm, RegisterForm
 from .loyalty_service import LoyaltyService
 
-# New APIs
+#  APIs
 from .services.cloudmail_service import CloudMailService
 from .services.currency_service import CurrencyService  # For points → currency conversion
 from .services.carbon_intensity_service import CarbonIntensityService  # UK Carbon Intensity
 
-# ==================== AUTH ====================
+# Autentication
 
 def register_view(request):
     if request.method == "POST":
@@ -48,7 +48,7 @@ def logout_view(request):
     return redirect("login")
 
 
-# ==================== HOME ====================
+# Home
 
 @login_required
 def home_view(request):
@@ -98,7 +98,7 @@ def home_view(request):
     return render(request, "carbon/home.html", context)
 
 
-# ==================== LOYALTY ====================
+# Loyalty
 
 @login_required
 def loyalty_connect_view(request):
@@ -152,7 +152,7 @@ def loyalty_dashboard_view(request):
     return render(request, "carbon/loyalty_dashboard.html", context)
 
 
-# ==================== CARBON ENTRIES (CRUD) ====================
+# Caarbon CRUD entries
 
 @login_required
 def entry_list(request):
