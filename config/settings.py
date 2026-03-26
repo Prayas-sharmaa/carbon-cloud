@@ -3,14 +3,12 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv(
-    "DJANGO_SECRET_KEY",
-    "carboncloud-dev-unsafe-secret-key-change-in-production-12345"
-)
-DEBUG = True
+# ===== Security =====
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "carboncloud-dev-unsafe-secret-key-change-in-production-12345")
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
-ALLOWED_HOSTS = ["*"]
-
+# ===== Installed Apps =====
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -21,6 +19,7 @@ INSTALLED_APPS = [
     "carbon",
 ]
 
+# ===== Middleware =====
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -34,6 +33,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+# ===== Templates =====
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -52,17 +52,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+# ===== Databases =====
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',  # or mysql
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'Celebal123',
-        'HOST': 'loyalty-db.ceww9p7gmfyy.us-east-1.rds.amazonaws.com',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": os.getenv("POSTGRES_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.getenv("POSTGRES_DB", "postgres"),
+        "USER": os.getenv("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
 
+# ===== Password Validators =====
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -70,32 +72,35 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# ===== Internationalization =====
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# ===== Static Files =====
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ===== Auth Redirects =====
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
 
-LOYALTY_API_BASE_URL="http://loyalty-api.us-east-1.elasticbeanstalk.com/api/v1"
+# ===== External APIs =====
+LOYALTY_API_BASE_URL = os.getenv(
+    "LOYALTY_API_BASE_URL",
+    "http://loyalty-api.us-east-1.elasticbeanstalk.com/api/v1"
+)
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://loyalty-api.us-east-1.elasticbeanstalk.com/",
-    "http://carbon-app.us-east-1.elasticbeanstalk.com/",
-]
-
-# ===== CloudMail API (Classmate's Web Service) =====
 CLOUDMAIL_API_URL = os.getenv(
     "CLOUDMAIL_API_URL",
     "https://563u4wcc1g.execute-api.us-east-1.amazonaws.com/prod"
 )
 
+# ===== CSRF Trusted Origins =====
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    "http://localhost:8000,http://127.0.0.1:8000,http://loyalty-api.us-east-1.elasticbeanstalk.com,http://carbon-app.us-east-1.elasticbeanstalk.com"
+).split(",")
